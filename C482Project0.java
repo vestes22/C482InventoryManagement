@@ -125,7 +125,7 @@ public class C482Project0 extends Application
  
        //Creates the different screens.
        Scene main = new Scene(outerGrid, 1000, 400);
-       Scene addPart = new Scene(addPartsGrid, 450, 300);
+       Scene addPart = new Scene(addPartsGrid, 400, 300);
        Scene modifyPart = new Scene(modifyPartsGrid, 450, 300);
        Scene addProduct = new Scene(outerProductsGrid, 800, 400);
        Scene modifyProduct = new Scene(outerModifyProductsGrid, 800, 400);
@@ -336,7 +336,7 @@ public class C482Project0 extends Application
        
        RadioButton inHouse = new RadioButton("In-House");
        inHouse.setToggleGroup(addPartsToggle);
-       inHouse.setSelected(true);
+       //inHouse.setSelected(true);
        
        RadioButton outsourced = new RadioButton("Outsourced");
        outsourced.setToggleGroup(addPartsToggle);
@@ -392,57 +392,32 @@ public class C482Project0 extends Application
        
        //Creates "Company Name" label and textbox
        Label addCompanyName = new Label("    Company Name");
-       //addPartsGrid.add(addCompanyName, 0, 6, 1, 1);
-       GridPane.setConstraints(addCompanyName, 0, 6);
-       addCompanyName.visibleProperty().bind(addCompanyName.managedProperty());
-       addCompanyName.setManaged(false);
            
        TextField companyNameText = new TextField();
        companyNameText.setPromptText("Comp Nm");
-       //addPartsGrid.add(companyNameText, 1, 6, 1, 1);
-       GridPane.setConstraints(companyNameText, 1, 6);
-       companyNameText.visibleProperty().bind(companyNameText.managedProperty());
-       companyNameText.setManaged(false);
-       
        
        //Creates "Machine ID" label and textbox
        Label partMachineId = new Label("     Machine ID");
-       //addPartsGrid.add(partMachineId, 0, 6, 1, 1);
-       GridPane.setConstraints(partMachineId, 0, 6);
-       partMachineId.visibleProperty().bind(partMachineId.managedProperty());
-       partMachineId.setManaged(true);
            
        TextField partMachineText = new TextField();
        partMachineText.setPromptText("Mach ID");
-       partMachineText.visibleProperty().bind(partMachineText.managedProperty());
-       //addPartsGrid.add(partMachineId, 1, 6, 1, 1);
-       GridPane.setConstraints(partMachineId, 1, 6);
-       partMachineText.setManaged(true);
-       
        
        outsourced.setOnAction(e -> 
        {
-           addPartsGrid.getChildren().remove(partMachineId);
-           addPartsGrid.getChildren().remove(partMachineText);
-           addPartsGrid.getChildren().addAll(addCompanyName, companyNameText);                                                     //FIXME - Last trying to get radio buttons to toggle correctly. attempting to remove and add nodes to gridpane per toggle.
-       
+           addPartsGrid.getChildren().removeAll(partMachineId, partMachineText);
+           addPartsGrid.add(addCompanyName, 0, 6);
+           addPartsGrid.add(companyNameText, 1, 6);
            
-           //partMachineText.setManaged(false);
-           //partMachineId.setManaged(false);
-           //addCompanyName.setManaged(true);
-           //companyNameText.setManaged(true);
        });
        
        inHouse.setOnAction(e -> 
        {
-           addPartsGrid.getChildren().remove(addCompanyName);
-           addPartsGrid.getChildren().remove(companyNameText);
-           addPartsGrid.getChildren().addAll(partMachineText, partMachineId);
-           //addCompanyName.setManaged(false);
-           //companyNameText.setManaged(false);
-           //partMachineId.setManaged(true);
-           //partMachineText.setManaged(true);
+           addPartsGrid.getChildren().removeAll(addCompanyName, companyNameText);
+           addPartsGrid.add(partMachineId, 0, 6);
+           addPartsGrid.add(partMachineText, 1, 6);
        });
+       
+       inHouse.setSelected(true);
        
        //Creates Save and Cancel buttons used on "Add Part" screen.
        Button saveAddPart = new Button("Save");
