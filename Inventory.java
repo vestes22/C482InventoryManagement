@@ -1,5 +1,6 @@
 package c482project0;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Inventory 
@@ -8,10 +9,24 @@ public class Inventory
     private ObservableList<Products> allProducts;
     
     
-    public void addPart(Parts part)
+    public void addPart()                 
     {
-        
-       
+       Parts part = new InHouse(); 
+       part.setPartId(Integer.parseInt(partIdText.getText()));
+       part.setPartName(partNameText.getText());
+       part.setPartInv(Integer.parseInt(partInvText.getText()));
+       part.setPartPrice(Double.parseDouble(partPriceText.getText()));
+       part.setPartMax(Integer.parseInt(partMaxText.getText()));
+       part.setPartMin(Integer.parseInt(partMinText.getText()));
+       part.setPartMachineId(Integer.parseInt(partMachineText.getText()));
+       allParts.getItems().add(part);
+       partIdText.clear();
+       partNameText.clear();
+       partInvText.clear();
+       partPriceText.clear();
+       partMaxText.clear();
+       partMinText.clear();
+       partMachineText.clear();
     }
     
     /*
@@ -69,8 +84,12 @@ public class Inventory
     }
     */
     
+      
+   
+        
     public ObservableList<Parts> getAllParts()
     {
+        ObservableList<Parts> allParts = FXCollections.observableArrayList();
         return allParts;
     }
     
