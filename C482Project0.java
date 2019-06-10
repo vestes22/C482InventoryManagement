@@ -2,6 +2,7 @@ package c482project0;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,15 +27,14 @@ public class C482Project0 extends Application
 {
    Stage window;
    Scene main, addPart, modifyPart, addProduct, modifyProduct;
-   TextField partIdText, partNameText, partInvText, partPriceText, partMaxText, partMinText;
+   TextField partIdText, partNameText, partInvText, partPriceText, partMaxText, partMinText, machineIdText, companyNameText;
    TableView<Parts> parts;
    TableView<Products> products;
    TableView<Parts> addProductPartsTable;
    TableView<Parts> addedPartsTable;
    TableView<Parts> modifyProductPartsTable;
    TableView<Parts> modifiedPartsTable;
-   //ObservableList<Parts> data = 
-          // FXCollections.observableArrayList(new Parts(1, "Chocolate", 5, 10.00, 10, 2));
+   ObservableList<Parts> allParts;
    
    public static void main(String[] args)
    {
@@ -185,6 +185,14 @@ public class C482Project0 extends Application
        TableColumn<Parts, Integer> partMinColumn = new TableColumn<>("Min");
        partMinColumn.setCellValueFactory(new PropertyValueFactory<>("partMin"));
        
+       //Machine ID Column
+       TableColumn<Parts, Integer> machineIdColumn = new TableColumn<>("Machine ID");
+       machineIdColumn.setCellValueFactory(new PropertyValueFactory<>("machineId"));
+       
+       //Company Name Column
+       TableColumn<Parts, String> companyNameColumn = new TableColumn<>("Company Name");
+       companyNameColumn.setCellValueFactory(new PropertyValueFactory<>("companyName"));
+               
        parts = new TableView<>();
        //parts.setItems(getParts());
        parts.getColumns().addAll
@@ -194,10 +202,14 @@ public class C482Project0 extends Application
            partInventoryColumn, 
            partPriceColumn, 
            partMaxColumn, 
-           partMinColumn
+           partMinColumn,
+           machineIdColumn,
+           companyNameColumn
        );
        partMaxColumn.setVisible(false);
        partMinColumn.setVisible(false);
+       machineIdColumn.setVisible(false);
+       companyNameColumn.setVisible(false);
        partsGrid.add(parts, 0, 1, 3, 1);
        
        //Creates the table for the Products List
@@ -332,8 +344,7 @@ public class C482Project0 extends Application
        
        //Creates Radio Buttons used on "Add Part" screen. 
        ToggleGroup addPartsToggle = new ToggleGroup();
-       
-       
+      
        RadioButton inHouse = new RadioButton("In-House");
        inHouse.setToggleGroup(addPartsToggle);
        //inHouse.setSelected(true);
@@ -347,7 +358,7 @@ public class C482Project0 extends Application
        
        TextField partIdText = new TextField();
        partIdText.setPromptText("Auto Gen - Disabled");
-       partIdText.setDisable(true);
+       //partIdText.setDisable(true);
        addPartsGrid.add(partIdText, 1, 1, 1, 1);
       
        //Creates "Name" label and textbox.
@@ -391,30 +402,30 @@ public class C482Project0 extends Application
        partMinText.setMaxWidth(80);
        
        //Creates "Company Name" label and textbox
-       Label addCompanyName = new Label("    Company Name");
+       Label companyName = new Label("    Company Name");
            
        TextField companyNameText = new TextField();
        companyNameText.setPromptText("Comp Nm");
        
        //Creates "Machine ID" label and textbox
-       Label partMachineId = new Label("     Machine ID");
+       Label machineId = new Label("     Machine ID");
            
-       TextField partMachineText = new TextField();
-       partMachineText.setPromptText("Mach ID");
+       TextField machineIdText = new TextField();
+       machineIdText.setPromptText("Mach ID");
        
        outsourced.setOnAction(e -> 
        {
-           addPartsGrid.getChildren().removeAll(partMachineId, partMachineText);
-           addPartsGrid.add(addCompanyName, 0, 6);
+           addPartsGrid.getChildren().removeAll(machineId, machineIdText);
+           addPartsGrid.add(companyName, 0, 6);
            addPartsGrid.add(companyNameText, 1, 6);
            
        });
        
        inHouse.setOnAction(e -> 
        {
-           addPartsGrid.getChildren().removeAll(addCompanyName, companyNameText);
-           addPartsGrid.add(partMachineId, 0, 6);
-           addPartsGrid.add(partMachineText, 1, 6);
+           addPartsGrid.getChildren().removeAll(companyName, companyNameText);
+           addPartsGrid.add(machineId, 0, 6);
+           addPartsGrid.add(machineIdText, 1, 6);
        });
        
        inHouse.setSelected(true);
@@ -427,7 +438,7 @@ public class C482Project0 extends Application
        //Save Button functionality:
        saveAddPart.setOnAction(e -> 
        {
-           //addPartButton();
+           
            window.setScene(main);
        });
        
@@ -799,11 +810,41 @@ public class C482Project0 extends Application
        window.show();
    }
    
-
-    /*public ObservableList<Parts> getParts()
+       public void addPart()                 
+    {
+       Parts part = new InHouse();
+       part.setPartId(Integer.parseInt(partIdText.getText()));
+       part.setPartName(partNameText.getText());
+       part.setPartInventory(Integer.parseInt(partInvText.getText()));
+       part.setPartPrice(Double.parseDouble(partPriceText.getText()));
+       part.setPartMax(Integer.parseInt(partMaxText.getText()));
+       part.setPartMin(Integer.parseInt(partMinText.getText()));
+       part.setMachineId(Integer.parseInt(machineIdText.getText()));
+       allParts.getItems().add(part);
+       partIdText.clear();
+       partNameText.clear();
+       partInvText.clear();
+       partPriceText.clear();
+       partMaxText.clear();
+       partMinText.clear();
+       machineIdText.clear();
+    }
+   
+        public void deletePart()
+    {
+        ObservableList<Parts> partSelected, allPart;
+        allPart = allParts.getItems();
+        partSelected = allParts.getSelectionModel().getSelectedItems();
+        
+        partSelected.forEach(allPart::remove);
+    }
+        
+        
+    /*
+    public ObservableList<Parts> getMachineParts()
     {
         ObservableList<Parts> partsTable = FXCollections.observableArrayList();
-        partsTable.add(new Parts(1, "Chocolate Chip", 5, 10.00, 5, 1));
+        partsTable.add(new InHouse(, "Chocolate Chip", 5, 10.00, 5, 1));
         return partsTable;
     }*/
 }
