@@ -30,7 +30,7 @@ public class C482Project0 extends Application
    TextField partIdText, partNameText, partInvText, partPriceText, partMaxText, partMinText, machineIdText, companyNameText;
    TableView<Parts> parts;
    TableView<Products> products;
-   TableView<Parts> addProductPartsTable;
+   //TableView<Parts> addProductPartsTable;
    TableView<Parts> addedPartsTable;
    TableView<Parts> modifyProductPartsTable;
    TableView<Parts> modifiedPartsTable;
@@ -212,6 +212,8 @@ public class C482Project0 extends Application
        companyNameColumn.setVisible(false);
        partsGrid.add(parts, 0, 1, 3, 1);
        
+      
+       /*
        //Creates the table for the Products List
        //Product ID column
        TableColumn productIdColumn = new TableColumn("Product ID");
@@ -254,6 +256,7 @@ public class C482Project0 extends Application
        productMaxColumn.setVisible(false);
        productMinColumn.setVisible(false);
        productsGrid.add(products, 0, 1, 3, 1);
+       */
        
        //Creates "Main" screen buttons.
        Button exit = new Button("Exit");
@@ -438,8 +441,8 @@ public class C482Project0 extends Application
        //Save Button functionality:
        saveAddPart.setOnAction(e -> 
        {
-           
-           window.setScene(main);
+           addPart();
+           //window.setScene(main);
        });
        
        Button cancelAddPart = new Button("Cancel");
@@ -632,20 +635,63 @@ public class C482Project0 extends Application
        cancelAddProduct.setMaxWidth(65);
        cancelAddProduct.setOnAction(e -> window.setScene(main));
        
-       //Adds parts table to upper half of "Add Product" screen.
-       addProductPartsTable = new TableView<>();
-       //addProductPartsTable.setItems(data);
+       //Creates and adds parts table to upper half of "Add Product" screen.
+       //Part ID column
+       TableColumn<Parts, Integer> partIdCol = new TableColumn<>("Part ID");
+       partIdCol.setMinWidth(75);
+       partIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
+       
+       //Part Name Column
+       TableColumn<Parts, String> partNameCol = new TableColumn<>("Part Name");
+       partNameCol.setMinWidth(100);
+       partNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
+       
+       //Inventory Column
+       TableColumn<Parts, Integer> partInventoryCol = new TableColumn<>("Inventory Level");
+       partInventoryCol.setMinWidth(100);
+       partInventoryCol.setCellValueFactory(new PropertyValueFactory<>("partInventory"));
+     
+       //Price Column
+       TableColumn<Parts, Double> partPriceCol = new TableColumn<>("Price/Cost per Unit");
+       partPriceCol.setMinWidth(175);
+       partPriceCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
+       
+       //Max Column
+       TableColumn<Parts, Integer> partMaxCol = new TableColumn<>("Max");
+       partMaxCol.setCellValueFactory(new PropertyValueFactory<>("partMax"));
+       
+       //Min Column
+       TableColumn<Parts, Integer> partMinCol = new TableColumn<>("Min");
+       partMinCol.setCellValueFactory(new PropertyValueFactory<>("partMin"));
+       
+       //Machine ID Column
+       TableColumn<Parts, Integer> machineIdCol = new TableColumn<>("Machine ID");
+       machineIdCol.setCellValueFactory(new PropertyValueFactory<>("machineId"));
+       
+       //Company Name Column
+       TableColumn<Parts, String> companyNameCol = new TableColumn<>("Company Name");
+       companyNameCol.setCellValueFactory(new PropertyValueFactory<>("companyName"));
+               
+       TableView<Parts> addProductPartsTable = new TableView<>();
        addProductPartsTable.getColumns().addAll
        (
-           partIdColumn, 
-           partNameColumn, 
-           partInventoryColumn, 
-           partPriceColumn,
-           partMaxColumn,
-           partMinColumn
+           partIdCol,
+           partNameCol,
+           partInventoryCol, 
+           partPriceCol, 
+           partMaxCol, 
+           partMinCol,
+           machineIdCol,
+           companyNameCol
        );
+       partMaxCol.setVisible(false);
+       partMinCol.setVisible(false);
+       machineIdCol.setVisible(false);
+       companyNameCol.setVisible(false);
        rightAddProduct.add(addProductPartsTable, 0, 1, 4, 1);
        
+       
+    
        //Adds parts table to lower half of "Add Product" screen.
        addedPartsTable = new TableView<>();
        //addedPartsTable.setItems(data);
@@ -659,6 +705,7 @@ public class C482Project0 extends Application
            partMinColumn
        );
        rightAddProduct.add(addedPartsTable, 0, 3, 4, 1);
+       
        
        //Adds layout to "Add Product" screen
        HBox addProductHBox2 = new HBox(10, addProductMaxText, addProductMin, addProductMinText);
@@ -762,6 +809,8 @@ public class C482Project0 extends Application
        cancelModifyProduct.setMaxWidth(65);
        cancelModifyProduct.setOnAction(e -> window.setScene(main));
        
+       
+        /*
        //Adds the parts table to upper half of "Modify Product" screen.
        modifyProductPartsTable = new TableView<>();
        //modifyProductPartsTable.setItems(data);
@@ -789,6 +838,7 @@ public class C482Project0 extends Application
            partMinColumn
        );
        rightModifyProduct.add(modifiedPartsTable, 0, 3, 4, 1);
+       */
        
        //Adds layout to "Modify Product" screen
        HBox modifyProductHBox2 = new HBox(10, modifyProductMaxText, modifyProductMin, modifyProductMinText);
@@ -812,7 +862,7 @@ public class C482Project0 extends Application
    
        public void addPart()                 
     {
-       Parts part = new InHouse();
+       InHouse part = new InHouse();
        part.setPartId(Integer.parseInt(partIdText.getText()));
        part.setPartName(partNameText.getText());
        part.setPartInventory(Integer.parseInt(partInvText.getText()));
@@ -820,7 +870,7 @@ public class C482Project0 extends Application
        part.setPartMax(Integer.parseInt(partMaxText.getText()));
        part.setPartMin(Integer.parseInt(partMinText.getText()));
        part.setMachineId(Integer.parseInt(machineIdText.getText()));
-       allParts.getItems().add(part);
+       parts.getItems().add(part);
        partIdText.clear();
        partNameText.clear();
        partInvText.clear();
@@ -833,8 +883,8 @@ public class C482Project0 extends Application
         public void deletePart()
     {
         ObservableList<Parts> partSelected, allPart;
-        allPart = allParts.getItems();
-        partSelected = allParts.getSelectionModel().getSelectedItems();
+        allPart = parts.getItems();
+        partSelected = parts.getSelectionModel().getSelectedItems();
         
         partSelected.forEach(allPart::remove);
     }
