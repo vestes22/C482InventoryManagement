@@ -79,9 +79,19 @@ public class AddPartController implements Initializable
             int max = Integer.parseInt(addPartMaxText.getText());
             int min = Integer.parseInt(addPartMinText.getText());
             
-            if (name.equals(""))
+            if(min > max)
+            {
+                idWarningLabel.setText("*Min values cannot be greater than Max values.");
+            }
+            
+            else if (name.equals(""))
             {
                 idWarningLabel.setText("*All fields must be completed before saving.");
+            }
+            
+            else if (inv > max || inv < min)
+            {
+                idWarningLabel.setText("*Inventory must be between Max and Min values.");
             }
             
             else
@@ -117,7 +127,7 @@ public class AddPartController implements Initializable
                 }
             }
         }
-        catch (Exception e)
+        catch (NumberFormatException e)
         {
             idWarningLabel.setText("*All fields must be completed before saving.");
         }
