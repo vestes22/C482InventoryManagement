@@ -78,23 +78,44 @@ public class AddPartController implements Initializable
             double price = Double.parseDouble(addPartPriceText.getText());
             int max = Integer.parseInt(addPartMaxText.getText());
             int min = Integer.parseInt(addPartMinText.getText());
-            if (inHouseRb.isSelected())
+            
+            if (name.equals(""))
             {
-                int machId = Integer.parseInt(outsourcedOrInHouseText.getText());
-                Part newPart = new InHouse(Part.partIdGenerator(), name, price, inv, max, min, machId);
-                Inventory.addPart(newPart);
+                idWarningLabel.setText("*All fields must be completed before saving.");
             }
-            if (outsourcedRb.isSelected())
+            
+            else
             {
-                String companyName = outsourcedOrInHouseText.getText();
-                Part newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, max, min, companyName);
-                Inventory.addPart(newPart);
+                if (inHouseRb.isSelected())
+                {
+                    int machId = Integer.parseInt(outsourcedOrInHouseText.getText());
+                    Part newPart = new InHouse(Part.partIdGenerator(), name, price, inv, max, min, machId);
+                    Inventory.addPart(newPart);
+                    
+                    stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                    scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                    stage.setScene(new Scene(scene));
+                    stage.show();
+                }
+                if (outsourcedRb.isSelected())
+                {
+                    String companyName = outsourcedOrInHouseText.getText();
+                    if (companyName.equals(""))
+                    {
+                        idWarningLabel.setText("*All fields must be completed before saving.");
+                    }
+                    else
+                    {
+                        Part newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, max, min, companyName);
+                        Inventory.addPart(newPart);
+                        
+                        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                        scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                        stage.setScene(new Scene(scene));
+                        stage.show();
+                    }
+                }
             }
-        
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
         }
         catch (Exception e)
         {
