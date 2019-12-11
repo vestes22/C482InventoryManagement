@@ -138,10 +138,21 @@ public class ModifyPartController implements Initializable
                 }
             }
         
-            if (name.equals(""))
+            if(min > max)
+            {
+                warningLabel.setText("*Min values cannot be greater than Max values.");
+            }
+            
+            else if (name.equals(""))
             {
                 warningLabel.setText("*All fields must be completed before saving.");
             }
+            
+            else if (inv > max || inv < min)
+            {
+                warningLabel.setText("*Inventory must be between Max and Min values.");
+            }
+            
             else
             { 
                 if (modifyPartInHouseRb.isSelected())
