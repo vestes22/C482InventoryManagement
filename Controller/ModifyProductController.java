@@ -100,13 +100,34 @@ public class ModifyProductController implements Initializable
     @FXML
     void modifyProdAddButtonClicked(MouseEvent event) 
     {
+        productWarningLabel.setText("");
         Part addedPart = modifyProdTopTable.getSelectionModel().getSelectedItem();
-        associatedParts.add(addedPart);
+        if (isPresent(addedPart.getId(), associatedParts))
+        {
+            productWarningLabel.setText("That part is already associated with this product.");
+        }
+        else 
+        {
+            associatedParts.add(addedPart);
+        }
         modifyProdBottomTable.setItems(associatedParts);
         bottomModifyProdIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         bottomModifyProdNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         bottomModifyProdInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         bottomModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+    }
+    
+    //Searches whether a Part exists based on ID.
+    private boolean isPresent(int id, ObservableList<Part> parts)
+    {
+       for (Part part : parts)
+       {
+           if (part.getId() == id)
+           {
+               return true;
+           }
+       }
+       return false;
     }
 
     @FXML
@@ -159,14 +180,21 @@ public class ModifyProductController implements Initializable
             {
                 newProduct.addAssociatedPart(part);
             }
-        
-            Inventory.updateProduct(index, newProduct);
-            associatedParts.clear();
+            
+            if(name.equals(""))
+            {
+                productWarningLabel.setText("*All fields must be completed before saving.");
+            }
+            else
+            {
+                Inventory.updateProduct(index, newProduct);
+                associatedParts.clear();
           
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
+                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
+            }
         }
         catch(Exception e)
         {
