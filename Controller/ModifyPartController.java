@@ -68,12 +68,14 @@ public class ModifyPartController implements Initializable
     private Label warningLabel;
     
     @FXML
-    void inHouseSelected(MouseEvent event) {
+    void inHouseSelected(MouseEvent event) 
+    {
         outsourcedOrInHouseLabel.setText("Machine ID");
     }
     
     @FXML
-    void outsourcedSelected(MouseEvent event) {
+    void outsourcedSelected(MouseEvent event) 
+    {
         outsourcedOrInHouseLabel.setText("Company Name");
     }
     
@@ -102,7 +104,6 @@ public class ModifyPartController implements Initializable
             outsourcedOrInHouseLabel.setText("Company Name");
             outsourcedOrInHouseText.setText(String.valueOf(outsourcedPart.getCompanyName()));
         }
-        
     }
 
     @FXML
@@ -148,18 +149,30 @@ public class ModifyPartController implements Initializable
                     int machId = Integer.parseInt(outsourcedOrInHouseText.getText());
                     newPart = new InHouse(id, name, price, inv, max, min, machId);
                     Inventory.updatePart(index, newPart);
+                    
+                    stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                    scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                    stage.setScene(new Scene(scene));
+                    stage.show();
                 }
                 if (modifyPartOutsourcedRb.isSelected())
                 {
                     String companyName = outsourcedOrInHouseText.getText();
-                    newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, max, min, companyName);
-                    Inventory.updatePart(index, newPart);
+                    if (companyName.equals(""))
+                    {
+                        warningLabel.setText("*All fields must be completed before saving");
+                    }
+                    else
+                    {
+                        newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, max, min, companyName);
+                        Inventory.updatePart(index, newPart);
+                        
+                        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+                        scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                        stage.setScene(new Scene(scene));
+                        stage.show();
+                    }
                 }
-          
-                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-                scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
-                stage.setScene(new Scene(scene));
-                stage.show();
             }
         }
         catch(Exception e)
