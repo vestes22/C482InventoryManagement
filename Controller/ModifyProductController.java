@@ -181,10 +181,21 @@ public class ModifyProductController implements Initializable
                 newProduct.addAssociatedPart(part);
             }
             
-            if(name.equals(""))
+            if(min > max)
+            {
+                productWarningLabel.setText("*Min values cannot be greater than Max values.");
+            }
+            
+            else if (name.equals(""))
             {
                 productWarningLabel.setText("*All fields must be completed before saving.");
             }
+            
+            else if (inv > max || inv < min)
+            {
+                productWarningLabel.setText("*Inventory must be between Max and Min values.");
+            }
+            
             else
             {
                 Inventory.updateProduct(index, newProduct);
