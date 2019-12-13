@@ -5,13 +5,16 @@ import Model.Inventory;
 import Model.Outsourced;
 import Model.Part;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -52,22 +55,30 @@ public class AddPartController implements Initializable
 
     @FXML
     private RadioButton outsourcedRb;
-
-    @FXML
-    private Button addPartCancelButton;
     
-    @FXML
-    private Label idWarningLabel;
-
+    /*
+    *Asks user if they want to exit without saving. Redirects to Main Screen.
+    */
     @FXML
     void addPartCancelButtonClicked(MouseEvent event) throws Exception 
     {
-        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Are you sure you want to exit without saving?");
+        Optional<ButtonType> answer = alert.showAndWait();
+        
+        if(answer.isPresent() && answer.get() == ButtonType.OK)
+        {
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            scene = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+        } 
     }
-
+    
+    /*
+    * Saves the new Part into Inventory and redirects to main screen.
+    * Generates an alert box if entered information doesn't match constraints.
+    */
     @FXML
     void addPartSaveButtonClicked(MouseEvent event) throws Exception
     {
@@ -81,17 +92,26 @@ public class AddPartController implements Initializable
             
             if(min > max)
             {
-                idWarningLabel.setText("*Min values cannot be greater than Max values.");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("WARNING: Invalid Values");
+                alert.setContentText("Min values cannot be greater than Max values.");
+                alert.showAndWait();
             }
             
             else if (name.equals(""))
             {
-                idWarningLabel.setText("*All fields must be completed before saving.");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("WARNING: Empty Fields");
+                alert.setContentText("All fields must be completed before saving.");
+                alert.showAndWait();
             }
             
             else if (inv > max || inv < min)
             {
-                idWarningLabel.setText("*Inventory must be between Max and Min values.");
+                Alert invAlert = new Alert(Alert.AlertType.WARNING);
+                invAlert.setTitle("WARNING: Invalid Values");
+                invAlert.setContentText("Inventory must be between Max and Min values.");
+                invAlert.showAndWait();
             }
             
             else
@@ -99,11 +119,11 @@ public class AddPartController implements Initializable
                 if (inHouseRb.isSelected())
                 {
                     int machId = Integer.parseInt(outsourcedOrInHouseText.getText());
-                    Part newPart = new InHouse(Part.partIdGenerator(), name, price, inv, max, min, machId);
+                    Part newPart = new InHouse(Part.partIdGenerator(), name, price, inv, min, max, machId);
                     Inventory.addPart(newPart);
                     
                     stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-                    scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                    scene = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
                     stage.setScene(new Scene(scene));
                     stage.show();
                 }
@@ -112,15 +132,18 @@ public class AddPartController implements Initializable
                     String companyName = outsourcedOrInHouseText.getText();
                     if (companyName.equals(""))
                     {
-                        idWarningLabel.setText("*All fields must be completed before saving.");
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("WARNING: Empty Fields");
+                        alert.setContentText("All fields must be completed before saving.");
+                        alert.showAndWait();
                     }
                     else
                     {
-                        Part newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, max, min, companyName);
+                        Part newPart = new Outsourced(Part.partIdGenerator(), name, price, inv, min, max, companyName);
                         Inventory.addPart(newPart);
                         
                         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-                        scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                        scene = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
                         stage.setScene(new Scene(scene));
                         stage.show();
                     }
@@ -129,10 +152,16 @@ public class AddPartController implements Initializable
         }
         catch (NumberFormatException e)
         {
-            idWarningLabel.setText("*All fields must be completed before saving.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("WARNING: Empty Fields");
+            alert.setContentText("All fields must be completed before saving.");
+            alert.showAndWait();
         }
     }
-
+    
+    /*
+    * Displays correct fields depending on RadioButton Selected (InHouse or Outsourced).
+    */
     @FXML
     void inHouseSelected(MouseEvent event) 
     {
@@ -155,5 +184,4 @@ public class AddPartController implements Initializable
         outsourcedOrInHouseLabel.setText("Machine ID");
         outsourcedOrInHouseText.setPromptText("Mach ID");
     }
-
 }
