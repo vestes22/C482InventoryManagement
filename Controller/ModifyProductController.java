@@ -4,6 +4,7 @@ import Model.Inventory;
 import Model.Part;
 import Model.Product;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +13,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -45,21 +48,6 @@ public class ModifyProductController implements Initializable
 
     @FXML
     private TextField modifyProdMaxText;
-
-    @FXML
-    private Button modifyProdSearchButton;
-
-    @FXML
-    private Button modifyProdAddButton;
-
-    @FXML
-    private Button modifyProdDeleteButton;
-
-    @FXML
-    private Button modifyProdCancelButton;
-
-    @FXML
-    private Button modifyProdSaveButton;
 
     @FXML
     private TextField modifyProdSearchText;
@@ -95,16 +83,23 @@ public class ModifyProductController implements Initializable
     private TableColumn<Part, Double> bottomModifyProdPriceCol;
     
     @FXML
-    private Label productWarningLabel;
+    private Label warningLabel;
 
+    /*
+    * Associates the selected Part to the Product being modified.
+    */
     @FXML
     void modifyProdAddButtonClicked(MouseEvent event) 
     {
-        productWarningLabel.setText("");
+        warningLabel.setText("");
+        if (modifyProdTopTable.getSelectionModel().getSelectedItem() == null)
+        {
+            warningLabel.setText("Please select a part to associate.");
+        }
         Part addedPart = modifyProdTopTable.getSelectionModel().getSelectedItem();
         if (isPresent(addedPart.getId(), associatedParts))
         {
-            productWarningLabel.setText("That part is already associated with this product.");
+            warningLabel.setText("That part is already associated with this product.");
         }
         else 
         {
@@ -116,33 +111,19 @@ public class ModifyProductController implements Initializable
         bottomModifyProdInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         bottomModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
-    
-    //Searches whether a Part exists based on ID.
-    private boolean isPresent(int id, ObservableList<Part> parts)
-    {
-       for (Part part : parts)
-       {
-           if (part.getId() == id)
-           {
-               return true;
-           }
-       }
-       return false;
-    }
 
-    @FXML
-    void modifyProdCancelButtonClicked(MouseEvent event) throws Exception 
-    {
-       stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-    }
-
+    /*
+    * Dissociates the selected Part from the Product being modified.
+    */
     @FXML
     void modifyProdDeleteButtonClicked(MouseEvent event) 
     {
+        warningLabel.setText("");
         int index = modifyProdBottomTable.getSelectionModel().getSelectedIndex();
+        if (modifyProdBottomTable.getSelectionModel().getSelectedItem() == null)
+        {
+            warningLabel.setText("Please select a part to remove.");
+        }
         associatedParts.remove(index);
         modifyProdBottomTable.setItems(associatedParts);
         bottomModifyProdIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -150,7 +131,31 @@ public class ModifyProductController implements Initializable
         bottomModifyProdInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         bottomModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
+    
+    /*
+    * Asks user if they want to exit without saving.
+    * Redirects to the Main Screen.
+    */
+    @FXML
+    void modifyProdCancelButtonClicked(MouseEvent event) throws Exception 
+    {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Are you sure you want to exit without saving?");
+        Optional<ButtonType> answer = alert.showAndWait();
+        
+        if(answer.isPresent() && answer.get() == ButtonType.OK)
+        {
+            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+            scene = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+        }
+    }
 
+    /*
+    * Saves the changes to the Product being modified and updates the Product in Inventory.
+    * Redirects to the Main Screen.
+    */
     @FXML
     void modifyProdSaveButtonClicked(MouseEvent event) 
     {
@@ -174,7 +179,7 @@ public class ModifyProductController implements Initializable
                 }
             }
         
-            newProduct = new Product(id, name, price, inv, max, min);
+            newProduct = new Product(id, name, price, inv, min, max);
         
             for (Part part : associatedParts)
             {
@@ -183,17 +188,26 @@ public class ModifyProductController implements Initializable
             
             if(min > max)
             {
-                productWarningLabel.setText("*Min values cannot be greater than Max values.");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("WARNING: Invalid Values");
+                alert.setContentText("Min values cannot be greater than Max values.");
+                alert.showAndWait();
             }
             
             else if (name.equals(""))
             {
-                productWarningLabel.setText("*All fields must be completed before saving.");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("WARNING: Empty Fields");
+                alert.setContentText("All fields must be completed before saving.");
+                alert.showAndWait();
             }
             
             else if (inv > max || inv < min)
             {
-                productWarningLabel.setText("*Inventory must be between Max and Min values.");
+                Alert invAlert = new Alert(Alert.AlertType.WARNING);
+                invAlert.setTitle("WARNING: Invalid Values");
+                invAlert.setContentText("Inventory must be between Max and Min values.");
+                invAlert.showAndWait();
             }
             
             else
@@ -202,24 +216,64 @@ public class ModifyProductController implements Initializable
                 associatedParts.clear();
           
                 stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-                scene = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+                scene = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
                 stage.setScene(new Scene(scene));
                 stage.show();
             }
         }
         catch(Exception e)
         {
-            productWarningLabel.setText("*All fields must be completed before saving.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("WARNING: Empty Fields");
+            alert.setContentText("All fields must be completed before saving.");
+            alert.showAndWait();
         }      
     }
 
+    /*
+    * Allows user to search Parts by both Part Name and Part ID.
+    * Displays the results in the TableView.
+    */
     @FXML
     void modifyProdSearchButtonClicked(MouseEvent event) 
     {
-        System.out.println("Search Button Clicked!");
+        searchedParts.clear();
+        warningLabel.setText("");
+        try
+        {
+            try
+            {
+                int id = Integer.parseInt(modifyProdSearchText.getText());
+                searchedParts.add(Inventory.lookupPart(id));
+            }
+            catch(Exception e)
+            {
+                String name = modifyProdSearchText.getText();
+                searchedParts = Inventory.lookupPart(name);
+            }
+            if (searchedParts.size() == 0)
+            {
+                warningLabel.setText("Sorry, we couldn't find that part.");
+            }
+            else
+            {
+                modifyProdTopTable.setItems(searchedParts);
+                topModifyProdIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+                topModifyProdNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+                topModifyProdInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
+                topModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            }
+        }
+        catch(Exception e)
+        {
+            warningLabel.setText("Sorry, we couldn't find that part.");
+        }
     }
     
-    //Selects the product to be modified and populates TextFields with selected data.
+    /*
+    * Allows us to use an instance of ModifyProductController to pass information from the Main Screen to the Modify Product screen.
+    * Allows us to parse and pre-fill data for the Product to be modified.
+    */
     public void selectModifiedProduct(Product product)
     {
         modifyProdIdText.setText(String.valueOf(product.getId()));
@@ -241,6 +295,22 @@ public class ModifyProductController implements Initializable
         bottomModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
     
+    /*
+    * Searches whether a Part exists based on ID.
+    * Used in modifyProdAddButtonClicked() to prevent the same Part from being associated more than once.
+    */
+    private boolean isPresent(int id, ObservableList<Part> parts)
+    {
+       for (Part part : parts)
+       {
+           if (part.getId() == id)
+           {
+               return true;
+           }
+       }
+       return false;
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
@@ -251,5 +321,4 @@ public class ModifyProductController implements Initializable
         topModifyProdInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         topModifyProdPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
-    
 }
