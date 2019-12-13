@@ -4,6 +4,7 @@ import Model.Inventory;
 import Model.Part;
 import Model.Product;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -13,7 +14,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,42 +32,12 @@ public class MainScreenController implements Initializable{
     private ObservableList<Part> searchedParts = FXCollections.observableArrayList();
     private ObservableList<Product> searchedProducts = FXCollections.observableArrayList();
     
-    @FXML
-    private Button exitButton;
-
-    @FXML
-    private Label label;
-    
     @FXML 
     private Label warningLabel;
     
     @FXML 
     private Label prodWarningLabel;
 
-    @FXML
-    private Button partSearchButton;
-
-    @FXML
-    private Button productSearchButton;
-
-    @FXML
-    private Button partAddButton;
-
-    @FXML
-    private Button partModifyButton;
-
-    @FXML
-    private Button partDeleteButton;
-
-    @FXML
-    private Button prodAddButton;
-
-    @FXML
-    private Button prodModifyButton;
-
-    @FXML
-    private Button prodDeleteButton;
-    
     @FXML
     private TextField partSearchText;
 
@@ -102,67 +75,102 @@ public class MainScreenController implements Initializable{
     private TableColumn<Product, Double> prodPriceCol;
     
     
-    //Changes scene to the Add Part screen.
+    /*
+    * Redirects to Add Part screen.
+    */
     @FXML
     void addPartButton(MouseEvent event) throws Exception
     {
         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/view/AddPartFXML.fxml"));
+        scene = FXMLLoader.load(getClass().getResource("/View/AddPartFXML.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
     }
 
-    //Changes scene to the Add Product screen.
+    /*
+    * Redirects to Add Product screen.
+    */
     @FXML
     void addProdButton(MouseEvent event) throws Exception
     {
         stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/view/AddProductFXML.fxml"));
+        scene = FXMLLoader.load(getClass().getResource("/View/AddProductFXML.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
     }
 
-    //Deletes the selected part.
+    /*
+    * Asks user if they want to delete the selected Part.
+    * Removes Part from Inventory and redisplays TableView.
+    */
     @FXML
     void deletePartButton(MouseEvent event) 
     {
-        boolean delete = Inventory.deletePart(partTable.getSelectionModel().getSelectedItem());
-        
-        if (delete == true)
-        {
-            partTable.setItems(Inventory.getAllParts());
-            warningLabel.setText("Part deleted.");
-        }
-        else
+        warningLabel.setText("");
+        if(partTable.getSelectionModel().getSelectedItem() == null)
         {
             warningLabel.setText("Please select part to delete.");
         }
+        
+        if(partTable.getSelectionModel().getSelectedItem() != null)
+        {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Are you sure you want to delete this part?");
+            Optional<ButtonType> answer = alert.showAndWait();
 
+            if(answer.isPresent() && answer.get() == ButtonType.OK)
+            {
+                boolean delete = Inventory.deletePart(partTable.getSelectionModel().getSelectedItem());
+
+                if (delete == true)
+                {
+                    partTable.setItems(Inventory.getAllParts());
+                    warningLabel.setText("Part deleted.");
+                }
+            }
+        }
     }
 
-    //Deletes the selected product.
+    /*
+    * Asks user if they want to delete the selected Product.
+    * Removes Product from Inventory and redisplays TableView.
+    */
     @FXML
     void deleteProdButton(MouseEvent event) 
     {
-        boolean delete = Inventory.deleteProduct(prodTable.getSelectionModel().getSelectedItem());
-        
-        if (delete == true)
+        prodWarningLabel.setText("");
+        if(prodTable.getSelectionModel().getSelectedItem() == null)
         {
-            prodTable.setItems(Inventory.getAllProducts());
-            prodWarningLabel.setText("Product deleted.");
+            prodWarningLabel.setText("Please select product to delete.");
         }
-        else
+        
+        if(prodTable.getSelectionModel().getSelectedItem() != null)
         {
-            prodWarningLabel.setText("Please select a product to delete.");
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Are you sure you want to delete this product?");
+            Optional<ButtonType> answer = alert.showAndWait();
+
+            if(answer.isPresent() && answer.get() == ButtonType.OK)
+            {
+                boolean delete = Inventory.deleteProduct(prodTable.getSelectionModel().getSelectedItem());
+
+                if (delete == true)
+                {
+                    prodTable.setItems(Inventory.getAllProducts());
+                    prodWarningLabel.setText("Product deleted.");
+                }
+            }
         }
     }
     
-    //Changes scene to the Modify Part screen.
+    /*
+    * Redirects user to the Modify Part screen.
+    */
     @FXML
     void modifyPartButton(MouseEvent event) throws Exception
     {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/view/ModifyPartFXML.fxml"));
+        loader.setLocation(getClass().getResource("/View/ModifyPartFXML.fxml"));
         loader.load();
         ModifyPartController modifyController = loader.getController();
         try
@@ -180,11 +188,14 @@ public class MainScreenController implements Initializable{
         
     }
 
+    /*
+    * Redirects user to the Modify Product screen.
+    */
     @FXML
     void modifyProdButton(MouseEvent event) throws Exception
     {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/view/ModifyProductFXML.fxml"));
+        loader.setLocation(getClass().getResource("/View/ModifyProductFXML.fxml"));
         loader.load();
         ModifyProductController modifyProdController = loader.getController();
         try
@@ -201,20 +212,39 @@ public class MainScreenController implements Initializable{
         }
     }
 
-    //Searches the Part Table.
+    /*
+    * Allows user to search for a Part based on Part Name and Part ID.
+    * Displays results in the TableView.
+    */
     @FXML
     void searchPartButton(MouseEvent event) 
     {
         searchedParts.clear();
+        warningLabel.setText("");
         try
         {
-            int id = Integer.parseInt(partSearchText.getText());
-            searchedParts.add(Inventory.lookupPart(id));
-            partTable.setItems(searchedParts);
-            partIDCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-            partNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-            partInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
-            partPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            try
+            {
+                int id = Integer.parseInt(partSearchText.getText());
+                searchedParts.add(Inventory.lookupPart(id));
+            }
+            catch(Exception e)
+            {
+                String name = partSearchText.getText();
+                searchedParts = Inventory.lookupPart(name);
+            }
+            if (searchedParts.size() == 0)
+            {
+                warningLabel.setText("Sorry, we couldn't find that part.");
+            }
+            else
+            {
+                partTable.setItems(searchedParts);
+                partIDCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+                partNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+                partInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
+                partPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            }
         }
         catch(Exception e)
         {
@@ -222,31 +252,60 @@ public class MainScreenController implements Initializable{
         }
     }
 
+    /*
+    * Allows user to search for a Product based on Product Name and Product ID.
+    * Displays results in the TableView.
+    */
     @FXML
     void searchProdButton(MouseEvent event) 
     {
         searchedProducts.clear();
+        prodWarningLabel.setText("");
         try
         {
-            prodWarningLabel.setText("");
-            int id = Integer.parseInt(productSearchText.getText());
-            searchedProducts.add(Inventory.lookupProduct(id));
-            prodTable.setItems(searchedProducts);
-            prodIDCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-            prodNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-            prodInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
-            prodPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            try
+            {
+                int id = Integer.parseInt(productSearchText.getText());
+                searchedProducts.add(Inventory.lookupProduct(id));
+            }
+            catch(Exception e)
+            {
+                String name = productSearchText.getText();
+                searchedProducts = Inventory.lookupProduct(name);
+            }
+            if (searchedProducts.size() == 0)
+            {
+                prodWarningLabel.setText("Sorry, we couldn't find that product.");
+            }
+            else
+            {
+                prodTable.setItems(searchedProducts);
+                prodIDCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+                prodNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+                prodInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
+                prodPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+            }
         }
         catch(Exception e)
         {
-            prodWarningLabel.setText("Sorry, we couldn't find that product.");
+            warningLabel.setText("Sorry, we couldn't find that part.");
         }
     }
     
+    /*
+    * Closes the program.
+    */
     @FXML
     void exit(MouseEvent event) 
     {
-        Platform.exit();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Are you sure you want to exit the program?");
+        Optional<ButtonType> answer = alert.showAndWait();
+        
+        if(answer.isPresent() && answer.get() == ButtonType.OK)
+        {
+            Platform.exit();
+        }
     }
     
     @Override
@@ -264,5 +323,4 @@ public class MainScreenController implements Initializable{
         prodInvCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
         prodPriceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
     }
-
 }
