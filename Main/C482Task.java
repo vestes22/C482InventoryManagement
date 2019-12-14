@@ -1,4 +1,4 @@
-package c482task;
+package virginiaestesc482;
 
 import Model.InHouse;
 import Model.Inventory;
@@ -6,18 +6,19 @@ import Model.Outsourced;
 import Model.Part;
 import Model.Product;
 import javafx.application.Application;
+import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class C482Task extends Application 
+public class VirginiaEstesC482 extends Application 
 {
     
     @Override
     public void start(Stage stage) throws Exception 
     {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/MainScreenFXML.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/View/MainScreenFXML.fxml"));
         
         Scene scene = new Scene(root);
         
@@ -27,6 +28,9 @@ public class C482Task extends Application
 
     public static void main(String[] args) 
     {
+        /*
+        * Loads the application with sample data.
+        */
         Part part1 = new InHouse(1, "Part 1", 1.11, 5, 2, 10, 10);
         Part part2 = new InHouse(2, "Part 2", 2.22, 6, 2, 10, 20);
         Part part3 = new InHouse(3, "Part 3", 3.33, 7, 5, 15, 10);
@@ -67,5 +71,5 @@ public class C482Task extends Application
         
         launch(args);
     }
-    
 }
+
