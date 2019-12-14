@@ -20,6 +20,9 @@ public class Inventory
        allProducts.add(newProduct);
     }
     
+    /*
+    * Searches Parts by Part ID.
+    */
     public static Part lookupPart(int partId)
     {
         int index = -1;
@@ -33,6 +36,9 @@ public class Inventory
         return allParts.get(index);
     }
     
+    /*
+    * Searches Products by Product ID.
+    */
     public static Product lookupProduct(int productId)
     {
         int index = -1;
@@ -46,13 +52,16 @@ public class Inventory
         return allProducts.get(index);
     }
     
+    /*
+    * Searches Parts by Part Name.
+    */
     public static ObservableList<Part> lookupPart(String partName)
     {
         searchedParts.clear();
         
         for (int i = 0; i < allParts.size(); i++)
         {
-            if (allParts.get(i).getName() == partName)
+            if (allParts.get(i).getName().equals(partName))
             {
                 searchedParts.add(allParts.get(i));
             }
@@ -60,13 +69,16 @@ public class Inventory
         return searchedParts;
     }
     
+    /*
+    * Searches Products by Product Name.
+    */
     public static ObservableList<Product> lookupProduct(String productName)
     {
         searchedProducts.clear();
         
         for (int i = 0; i < allProducts.size(); i++)
         {
-            if (allProducts.get(i).getName() == productName)
+            if (allProducts.get(i).getName().equals(productName))
             {
                 searchedProducts.add(allProducts.get(i));
             }
@@ -84,6 +96,9 @@ public class Inventory
         allProducts.set(index, selectedProduct);
     }
     
+    /*
+    * Deletes a Part from Inventory.
+    */
     public static boolean deletePart(Part selectedPart)
     {
         if(allParts.remove(selectedPart))
@@ -94,7 +109,9 @@ public class Inventory
         return false;
     }
     
-    //Deletes a product from the Product Table.
+    /*
+    Deletes a Product from Inventory.
+    */
     public static boolean deleteProduct(Product selectedProduct)
     {
         if(allProducts.remove(selectedProduct))
@@ -114,3 +131,4 @@ public class Inventory
         return allProducts;
     }
 }
+
